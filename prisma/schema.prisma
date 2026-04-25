@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Salesperson {
+  id           Int           @id @default(autoincrement())
+  name         String
+  email        String        @unique
+  password     String
+  department   String?
+  position     String?
+  managerId    Int?
+  manager      Salesperson?  @relation("Manager", fields: [managerId], references: [id])
+  subordinates Salesperson[] @relation("Manager")
+  reports      DailyReport[]
+  comments     Comment[]
+  createdAt    DateTime      @default(now())
+}
+
+model Customer {
+  id           Int           @id @default(autoincrement())
+  companyName  String        @unique
+  contactName  String
+  phone        String?
+  email        String?
+  address      String?
+  industry     String?
+  visitRecords VisitRecord[]
+  createdAt    DateTime      @default(now())
+}
+
+model DailyReport {
+  id            Int           @id @default(autoincrement())
+  salespersonId Int
+  salesperson   Salesperson   @relation(fields: [salespersonId], references: [id])
+  reportDate    DateTime
+  currentIssues String?
+  tomorrowPlan  String?
+  visitRecords  VisitRecord[]
+  comments      Comment[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model VisitRecord {
+  id           Int         @id @default(autoincrement())
+  reportId     Int
+  report       DailyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  customerId   Int
+  customer     Customer    @relation(fields: [customerId], references: [id])
+  visitContent String
+  visitTime    String?
+  createdAt    DateTime    @default(now())
+}
+
+model Comment {
+  id          Int         @id @default(autoincrement())
+  reportId    Int
+  report      DailyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  commenterId Int
+  commenter   Salesperson @relation(fields: [commenterId], references: [id])
+  content     String
+  createdAt   DateTime    @default(now())
+}

@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npx eslint *)",
+      "Bash(npx jest *)",
+      "Bash(node *)",
+      "Bash(npx prisma *)",
+      "Bash(npx ts-node *)",
+      "Bash(npm run *)",
+      "Bash(npx next *)",
+      "Bash(gh repo *)",
+      "Bash(git remote *)",
+      "Bash(git init *)",
+      "Bash(git add *)"
+    ]
+  }
+}
