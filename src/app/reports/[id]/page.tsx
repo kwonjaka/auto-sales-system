@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import AppLayout from "@/components/Layout";
 import { type AuthUser, authHeaders, getUser } from "@/lib/client-auth";
@@ -26,13 +26,13 @@ export default function ReportDetailPage() {
 
   useEffect(() => { setUser(getUser()); }, []);
 
-  const load = () => {
+  const load = useCallback(() => {
     fetch(`/api/v1/reports/${id}`, { headers: authHeaders() })
       .then((r) => r.json())
       .then((j) => j.success && setReport(j.data));
-  };
+  }, [id]);
 
-  useEffect(() => { load(); }, [id]);
+  useEffect(() => { load(); }, [load]);
 
   const deleteReport = async () => {
     if (!confirm("보고서를 삭제하시겠습니까?")) return;
