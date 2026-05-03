@@ -39,39 +39,65 @@ export default function NewSalespersonPage() {
 
   return (
     <AppLayout>
-      <h2 className="text-xl font-bold mb-4">영업사원 등록</h2>
-      <div className="bg-white rounded shadow p-6 max-w-lg">
-        <form onSubmit={submit} className="space-y-4">
-          {[
-            { key: "name", label: "이름", type: "text", required: true },
-            { key: "email", label: "이메일", type: "email", required: true },
-            { key: "password", label: "비밀번호", type: "password", required: true },
-            { key: "department", label: "부서", type: "text", required: false },
-            { key: "position", label: "직급", type: "text", required: false },
-          ].map(({ key, label, type, required }) => (
-            <div key={key}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{label}{required && " *"}</label>
-              <input type={type} required={required} value={(form as Record<string, string>)[key]}
-                onChange={(e) => set(key, e.target.value)}
-                className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">영업사원 등록</h1>
+          <p className="page-sub">새 영업사원을 등록합니다</p>
+        </div>
+      </div>
+
+      <div style={{ maxWidth: "560px" }}>
+        <div className="card">
+          <form onSubmit={submit} className="space-y-4">
+            <div className="grid gap-4" style={{ gridTemplateColumns: "1fr 1fr" }}>
+              {[
+                { key: "name", label: "이름", type: "text", required: true, placeholder: "홍길동", full: false },
+                { key: "email", label: "이메일", type: "email", required: true, placeholder: "hong@company.com", full: false },
+                { key: "password", label: "비밀번호", type: "password", required: true, placeholder: "최소 8자 이상", full: false },
+                { key: "department", label: "부서", type: "text", required: false, placeholder: "영업1팀", full: false },
+                { key: "position", label: "직급", type: "text", required: false, placeholder: "대리", full: false },
+              ].map(({ key, label, type, required, placeholder }) => (
+                <div key={key}>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                    {label}{required && <span className="text-indigo-500 ml-0.5">*</span>}
+                  </label>
+                  <input
+                    type={type}
+                    required={required}
+                    value={(form as Record<string, string>)[key]}
+                    onChange={(e) => set(key, e.target.value)}
+                    placeholder={placeholder}
+                    className="form-input"
+                  />
+                </div>
+              ))}
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">상급자</label>
+                <select value={form.managerId} onChange={(e) => set("managerId", e.target.value)} className="form-input">
+                  <option value="">선택 안 함</option>
+                  {managers.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
+                </select>
+              </div>
             </div>
-          ))}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">상급자</label>
-            <select value={form.managerId} onChange={(e) => set("managerId", e.target.value)}
-              className="w-full border rounded px-3 py-2 text-sm">
-              <option value="">선택 안 함</option>
-              {managers.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
-            </select>
-          </div>
-          {errorMsg && <p className="text-red-500 text-sm">{errorMsg}</p>}
-          <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={() => router.push("/salespeople")} className="px-4 py-2 border rounded text-sm hover:bg-gray-50">취소</button>
-            <button type="submit" disabled={loading} className="bg-blue-700 text-white px-6 py-2 rounded text-sm hover:bg-blue-800 disabled:opacity-50">
-              {loading ? "저장 중..." : "저장"}
-            </button>
-          </div>
-        </form>
+
+            {errorMsg && (
+              <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-red-50 border border-red-100">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#e11d48" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                <p className="text-red-600 text-sm">{errorMsg}</p>
+              </div>
+            )}
+
+            <div className="flex justify-end gap-3 pt-2">
+              <button type="button" onClick={() => router.push("/salespeople")} className="btn btn-ghost">취소</button>
+              <button type="submit" disabled={loading} className="btn btn-primary">
+                {loading ? "저장 중..." : "저장"}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </AppLayout>
   );

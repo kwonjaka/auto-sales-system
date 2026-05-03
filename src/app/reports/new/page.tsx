@@ -69,75 +69,150 @@ export default function NewReportPage() {
 
   return (
     <AppLayout>
-      <h2 className="text-xl font-bold mb-4">보고서 작성</h2>
-      <form onSubmit={submit} className="space-y-6">
-        <div className="bg-white rounded shadow p-4">
-          <div className="flex gap-4 text-sm text-gray-600 mb-4">
-            <span>보고일: <strong>{today}</strong></span>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">보고서 작성</h1>
+          <p className="page-sub">보고일: {today}</p>
+        </div>
+      </div>
+
+      <form onSubmit={submit} className="space-y-5">
+        {/* Visit records */}
+        <div className="card p-0 overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-50 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "#ede9fe" }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+              </div>
+              <h3 className="font-semibold text-slate-800">방문 기록</h3>
+              <span className="badge badge-purple">{rows.length}행</span>
+            </div>
+            <button
+              type="button"
+              onClick={addRow}
+              disabled={rows.length >= 20}
+              className="btn btn-ghost btn-sm"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              행 추가 ({rows.length}/20)
+            </button>
           </div>
 
-          <h3 className="font-medium mb-2 text-gray-700">방문 기록</h3>
-          <table className="w-full text-sm mb-2">
-            <thead className="bg-gray-50">
+          <table className="data-table">
+            <thead>
               <tr>
-                <th className="text-left px-2 py-2 font-medium text-gray-600 w-1/3">고객명</th>
-                <th className="text-left px-2 py-2 font-medium text-gray-600">방문내용</th>
-                <th className="px-2 py-2 w-20" />
+                <th style={{ width: "32px" }}>#</th>
+                <th style={{ width: "35%" }}>고객명 *</th>
+                <th>방문내용 *</th>
+                <th style={{ width: "48px" }} />
               </tr>
             </thead>
-            <tbody className="divide-y">
+            <tbody>
               {rows.map((row, i) => (
                 <tr key={i}>
-                  <td className="px-2 py-2">
-                    <select value={row.customerId} onChange={(e) => updateRow(i, "customerId", e.target.value)}
-                      className="w-full border rounded px-2 py-1">
+                  <td>
+                    <span className="badge badge-purple" style={{ minWidth: "24px", justifyContent: "center" }}>{i + 1}</span>
+                  </td>
+                  <td>
+                    <select
+                      value={row.customerId}
+                      onChange={(e) => updateRow(i, "customerId", e.target.value)}
+                      className="form-input"
+                      style={{ padding: "8px 12px" }}
+                    >
                       <option value="">고객 선택</option>
                       {customers.map((c) => (
                         <option key={c.id} value={c.id}>{c.companyName}</option>
                       ))}
                     </select>
                   </td>
-                  <td className="px-2 py-2">
-                    <input type="text" value={row.visitContent} onChange={(e) => updateRow(i, "visitContent", e.target.value)}
-                      placeholder="방문내용" className="w-full border rounded px-2 py-1" />
+                  <td>
+                    <input
+                      type="text"
+                      value={row.visitContent}
+                      onChange={(e) => updateRow(i, "visitContent", e.target.value)}
+                      placeholder="방문 내용을 입력하세요"
+                      className="form-input"
+                      style={{ padding: "8px 12px" }}
+                    />
                   </td>
-                  <td className="px-2 py-2 text-center">
-                    <button type="button" onClick={() => removeRow(i)}
-                      className="text-red-500 hover:text-red-700 text-xs">삭제</button>
+                  <td style={{ textAlign: "center" }}>
+                    <button
+                      type="button"
+                      onClick={() => removeRow(i)}
+                      disabled={rows.length <= 1}
+                      className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all disabled:opacity-30"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
+                    </button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          <button type="button" onClick={addRow} disabled={rows.length >= 20}
-            className="text-blue-600 text-sm hover:underline disabled:opacity-40">+ 행 추가</button>
         </div>
 
-        <div className="bg-white rounded shadow p-4 space-y-4">
-          <div>
-            <label className="block font-medium text-gray-700 mb-1">현재 과제 / 상담</label>
-            <textarea value={currentIssues} onChange={(e) => setCurrentIssues(e.target.value)}
-              rows={3} maxLength={2000}
-              className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="현재 진행 중인 과제나 상담 내용을 입력하세요." />
-          </div>
-          <div>
-            <label className="block font-medium text-gray-700 mb-1">내일 할 일</label>
-            <textarea value={tomorrowPlan} onChange={(e) => setTomorrowPlan(e.target.value)}
-              rows={3} maxLength={2000}
-              className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="내일 예정된 업무를 입력하세요." />
-          </div>
+        {/* Issues & Plan */}
+        <div className="grid gap-5" style={{ gridTemplateColumns: "1fr 1fr" }}>
+          {[
+            { label: "현재 과제 / 상담", value: currentIssues, setter: setCurrentIssues, placeholder: "현재 진행 중인 과제나 상담 내용을 입력하세요." },
+            { label: "내일 할 일", value: tomorrowPlan, setter: setTomorrowPlan, placeholder: "내일 예정된 업무를 입력하세요." },
+          ].map((item) => (
+            <div key={item.label} className="card">
+              <label className="block text-sm font-semibold text-slate-700 mb-2">{item.label}</label>
+              <textarea
+                value={item.value}
+                onChange={(e) => item.setter(e.target.value)}
+                rows={4}
+                maxLength={2000}
+                className="form-input"
+                placeholder={item.placeholder}
+                style={{ resize: "vertical" }}
+              />
+            </div>
+          ))}
         </div>
 
-        {errorMsg && <p className="text-red-500 text-sm">{errorMsg}</p>}
+        {errorMsg && (
+          <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-50 border border-red-100">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e11d48" strokeWidth="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <p className="text-red-600 text-sm">{errorMsg}</p>
+          </div>
+        )}
 
         <div className="flex justify-end gap-3">
-          <button type="button" onClick={() => router.push("/reports")}
-            className="px-4 py-2 border rounded text-sm hover:bg-gray-50">취소</button>
-          <button type="submit" disabled={loading}
-            className="bg-blue-700 text-white px-6 py-2 rounded text-sm hover:bg-blue-800 disabled:opacity-50">
-            {loading ? "저장 중..." : "저장"}
+          <button type="button" onClick={() => router.push("/reports")} className="btn btn-ghost">
+            취소
+          </button>
+          <button type="submit" disabled={loading} className="btn btn-primary">
+            {loading ? (
+              <>
+                <svg className="animate-spin" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                </svg>
+                저장 중...
+              </>
+            ) : (
+              <>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                저장
+              </>
+            )}
           </button>
         </div>
       </form>

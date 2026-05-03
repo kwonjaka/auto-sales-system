@@ -63,92 +63,187 @@ export default function ReportDetailPage() {
     load();
   };
 
-  if (!report) return <AppLayout><p className="text-gray-400 text-center py-12">불러오는 중...</p></AppLayout>;
+  if (!report) {
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-center py-24">
+          <div className="flex flex-col items-center gap-3 text-slate-400">
+            <svg className="animate-spin" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+            </svg>
+            <p className="text-sm">불러오는 중...</p>
+          </div>
+        </div>
+      </AppLayout>
+    );
+  }
 
   const isOwner = user?.id === report.salesperson.id;
   const isToday = report.reportDate === today;
 
   return (
     <AppLayout>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold">보고서 상세</h2>
+      {/* Header */}
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">보고서 상세</h1>
+          <p className="page-sub">{report.reportDate} · {report.salesperson.name}</p>
+        </div>
         <div className="flex gap-2">
-          <Link href="/reports" className="px-3 py-1.5 border rounded text-sm hover:bg-gray-50">목록</Link>
+          <Link href="/reports" className="btn btn-ghost btn-sm">목록</Link>
           {isOwner && isToday && (
             <>
-              <Link href={`/reports/${id}/edit`} className="px-3 py-1.5 border rounded text-sm hover:bg-gray-50">수정</Link>
-              <button onClick={deleteReport} className="px-3 py-1.5 bg-red-50 border border-red-200 text-red-600 rounded text-sm hover:bg-red-100">삭제</button>
+              <Link href={`/reports/${id}/edit`} className="btn btn-ghost btn-sm">수정</Link>
+              <button onClick={deleteReport} className="btn btn-danger btn-sm">삭제</button>
             </>
           )}
         </div>
       </div>
 
-      <div className="space-y-4">
-        <div className="bg-white rounded shadow p-4">
-          <div className="flex gap-6 text-sm text-gray-600 mb-4 pb-4 border-b">
-            <span>작성자: <strong>{report.salesperson.name}</strong></span>
-            <span>보고일: <strong>{report.reportDate}</strong></span>
+      {/* Meta card */}
+      <div className="card mb-5" style={{ background: "linear-gradient(135deg, #f8f7ff, #f0f2ff)", border: "1px solid #e0e7ff" }}>
+        <div className="flex flex-wrap gap-6">
+          <div className="flex items-center gap-3">
+            <div
+              className="w-11 h-11 rounded-full flex items-center justify-center text-sm font-bold text-white"
+              style={{ background: "linear-gradient(135deg, #6366f1, #8b5cf6)" }}
+            >
+              {report.salesperson.name.slice(0, 2)}
+            </div>
+            <div>
+              <p className="text-xs text-slate-500">작성자</p>
+              <p className="font-semibold text-slate-800">{report.salesperson.name}</p>
+            </div>
           </div>
+          <div>
+            <p className="text-xs text-slate-500">보고일</p>
+            <p className="font-semibold text-slate-800">{report.reportDate}</p>
+          </div>
+          <div>
+            <p className="text-xs text-slate-500">방문건수</p>
+            <p className="font-semibold"><span className="badge badge-purple">{report.visitRecords.length}건</span></p>
+          </div>
+          <div>
+            <p className="text-xs text-slate-500">댓글</p>
+            <p className="font-semibold"><span className="badge badge-blue">{report.comments.length}건</span></p>
+          </div>
+        </div>
+      </div>
 
-          <h3 className="font-medium text-gray-700 mb-2">방문 기록</h3>
-          <table className="w-full text-sm mb-1">
-            <thead className="bg-gray-50">
+      <div className="space-y-5">
+        {/* Visit records */}
+        <div className="card p-0 overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-50 flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "#ede9fe" }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+            </div>
+            <h3 className="font-semibold text-slate-800">방문 기록</h3>
+          </div>
+          <table className="data-table">
+            <thead>
               <tr>
-                <th className="text-left px-3 py-2 font-medium text-gray-600 w-8">#</th>
-                <th className="text-left px-3 py-2 font-medium text-gray-600 w-1/3">고객명</th>
-                <th className="text-left px-3 py-2 font-medium text-gray-600">방문내용</th>
+                <th style={{ width: "40px" }}>#</th>
+                <th style={{ width: "30%" }}>고객명</th>
+                <th>방문내용</th>
               </tr>
             </thead>
-            <tbody className="divide-y">
+            <tbody>
               {report.visitRecords.map((v, i) => (
                 <tr key={v.id}>
-                  <td className="px-3 py-2 text-gray-400">{i + 1}</td>
-                  <td className="px-3 py-2">{v.customer.companyName}</td>
-                  <td className="px-3 py-2">{v.visitContent}</td>
+                  <td>
+                    <span className="badge badge-purple" style={{ minWidth: "24px", justifyContent: "center" }}>{i + 1}</span>
+                  </td>
+                  <td className="font-medium text-slate-700">{v.customer.companyName}</td>
+                  <td className="text-slate-600">{v.visitContent}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
 
-        <div className="bg-white rounded shadow p-4 space-y-4">
-          <div>
-            <h3 className="font-medium text-gray-700 mb-1">현재 과제 / 상담</h3>
-            <p className="text-sm text-gray-600 whitespace-pre-wrap min-h-[2rem]">{report.currentIssues || <span className="text-gray-300">없음</span>}</p>
-          </div>
-          <div>
-            <h3 className="font-medium text-gray-700 mb-1">내일 할 일</h3>
-            <p className="text-sm text-gray-600 whitespace-pre-wrap min-h-[2rem]">{report.tomorrowPlan || <span className="text-gray-300">없음</span>}</p>
-          </div>
+        {/* Issues & Plan */}
+        <div className="grid gap-5" style={{ gridTemplateColumns: "1fr 1fr" }}>
+          {[
+            { label: "현재 과제 / 상담", value: report.currentIssues, color: "#fef3c7", iconColor: "#b45309", icon: "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" },
+            { label: "내일 할 일", value: report.tomorrowPlan, color: "#dcfce7", iconColor: "#15803d", icon: "M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9l2 2 4-4" },
+          ].map((item) => (
+            <div key={item.label} className="card">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: item.color }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={item.iconColor} strokeWidth="2">
+                    <path d={item.icon} strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+                <h3 className="font-semibold text-slate-800">{item.label}</h3>
+              </div>
+              <p className="text-sm text-slate-600 whitespace-pre-wrap leading-relaxed min-h-12">
+                {item.value || <span className="text-slate-300">내용 없음</span>}
+              </p>
+            </div>
+          ))}
         </div>
 
-        <div className="bg-white rounded shadow p-4">
-          <h3 className="font-medium text-gray-700 mb-3">댓글</h3>
+        {/* Comments */}
+        <div className="card">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "#dbeafe" }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" strokeWidth="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+            </div>
+            <h3 className="font-semibold text-slate-800">댓글</h3>
+            {report.comments.length > 0 && (
+              <span className="badge badge-blue">{report.comments.length}</span>
+            )}
+          </div>
+
           <div className="space-y-3 mb-4">
-            {report.comments.length === 0 && <p className="text-sm text-gray-400">댓글이 없습니다.</p>}
+            {report.comments.length === 0 && (
+              <p className="text-sm text-slate-400 py-4 text-center">아직 댓글이 없습니다.</p>
+            )}
             {report.comments.map((c) => (
-              <div key={c.id} className="bg-gray-50 rounded p-3">
-                <div className="flex justify-between items-start">
-                  <span className="text-sm font-medium text-gray-700">{c.commenter.name}</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-400">{new Date(c.createdAt).toLocaleString("ko-KR")}</span>
-                    {user?.id === c.commenter.id && (
-                      <button onClick={() => deleteComment(c.id)} className="text-xs text-red-400 hover:text-red-600">삭제</button>
-                    )}
-                  </div>
+              <div key={c.id} className="flex gap-3 p-4 rounded-xl" style={{ background: "#f8fafc" }}>
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+                  style={{ background: "linear-gradient(135deg, #f472b6, #a855f7)" }}
+                >
+                  {c.commenter.name.slice(0, 1)}
                 </div>
-                <p className="text-sm text-gray-600 mt-1">{c.content}</p>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <span className="text-sm font-semibold text-slate-700">{c.commenter.name}</span>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <span className="text-xs text-slate-400">{new Date(c.createdAt).toLocaleString("ko-KR")}</span>
+                      {user?.id === c.commenter.id && (
+                        <button
+                          onClick={() => deleteComment(c.id)}
+                          className="text-xs text-red-400 hover:text-red-600 transition-colors"
+                        >
+                          삭제
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <p className="text-sm text-slate-600">{c.content}</p>
+                </div>
               </div>
             ))}
           </div>
+
           {user?.isManager && (
             <form onSubmit={submitComment} className="flex gap-2">
-              <input type="text" value={comment} onChange={(e) => setComment(e.target.value)}
-                placeholder="댓글 입력 (상급자만 작성 가능)"
-                className="flex-1 border rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              <button type="submit" disabled={loading}
-                className="bg-blue-700 text-white px-4 py-1.5 rounded text-sm hover:bg-blue-800 disabled:opacity-50">
-                등록
+              <input
+                type="text"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="댓글을 입력하세요 (상급자만 작성 가능)"
+                className="form-input flex-1"
+              />
+              <button type="submit" disabled={loading} className="btn btn-primary">
+                {loading ? "등록 중..." : "등록"}
               </button>
             </form>
           )}

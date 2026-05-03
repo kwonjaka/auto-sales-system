@@ -51,57 +51,119 @@ export default function ReportsPage() {
 
   return (
     <AppLayout>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold">보고서 목록</h2>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">보고서 목록</h1>
+          <p className="page-sub">총 {total}건의 보고서</p>
+        </div>
         {!user?.isManager && (
           <button
             onClick={() => router.push("/reports/new")}
             disabled={todayReportExists}
-            className="bg-blue-700 text-white px-4 py-2 rounded text-sm hover:bg-blue-800 disabled:opacity-40"
+            className="btn btn-primary"
+            title={todayReportExists ? "오늘 보고서가 이미 작성되었습니다" : ""}
           >
-            + 새 보고서 작성
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            새 보고서 작성
           </button>
         )}
       </div>
 
-      <div className="bg-white rounded shadow p-4 mb-4 flex flex-wrap gap-3 items-end">
-        <div>
-          <label className="block text-xs text-gray-500 mb-1">시작일</label>
-          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)}
-            className="border rounded px-2 py-1 text-sm" />
+      {/* Filter */}
+      <div className="card mb-6">
+        <div className="flex flex-wrap gap-4 items-end">
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">시작일</label>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="form-input"
+              style={{ width: "160px" }}
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">종료일</label>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="form-input"
+              style={{ width: "160px" }}
+            />
+          </div>
+          <button onClick={() => { setPage(1); load(); }} className="btn btn-ghost">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            검색
+          </button>
         </div>
-        <div>
-          <label className="block text-xs text-gray-500 mb-1">종료일</label>
-          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)}
-            className="border rounded px-2 py-1 text-sm" />
-        </div>
-        <button onClick={() => { setPage(1); load(); }}
-          className="bg-gray-100 px-3 py-1 rounded text-sm border hover:bg-gray-200">검색</button>
       </div>
 
-      <div className="bg-white rounded shadow overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b">
+      {/* Table */}
+      <div className="card p-0 overflow-hidden">
+        <table className="data-table">
+          <thead>
             <tr>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">날짜</th>
-              {user?.isManager && <th className="text-left px-4 py-3 font-medium text-gray-600">영업사원</th>}
-              <th className="text-center px-4 py-3 font-medium text-gray-600">방문건수</th>
-              <th className="text-center px-4 py-3 font-medium text-gray-600">댓글수</th>
-              <th className="px-4 py-3" />
+              <th>날짜</th>
+              {user?.isManager && <th>영업사원</th>}
+              <th style={{ textAlign: "center" }}>방문건수</th>
+              <th style={{ textAlign: "center" }}>댓글수</th>
+              <th />
             </tr>
           </thead>
-          <tbody className="divide-y">
+          <tbody>
             {reports.length === 0 && (
-              <tr><td colSpan={5} className="text-center py-8 text-gray-400">보고서가 없습니다.</td></tr>
+              <tr>
+                <td colSpan={user?.isManager ? 5 : 4} style={{ textAlign: "center", padding: "48px", color: "#94a3b8" }}>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="1.5">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
+                    </svg>
+                    <p>보고서가 없습니다.</p>
+                  </div>
+                </td>
+              </tr>
             )}
             {reports.map((r) => (
-              <tr key={r.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3">{r.reportDate}</td>
-                {user?.isManager && <td className="px-4 py-3">{r.salesperson.name}</td>}
-                <td className="px-4 py-3 text-center">{r.visitCount}건</td>
-                <td className="px-4 py-3 text-center">{r.commentCount}건</td>
-                <td className="px-4 py-3 text-right">
-                  <Link href={`/reports/${r.id}`} className="text-blue-600 hover:underline text-xs">상세보기</Link>
+              <tr key={r.id}>
+                <td>
+                  <span className="font-semibold text-slate-700">{r.reportDate}</span>
+                </td>
+                {user?.isManager && (
+                  <td>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+                        style={{ background: "linear-gradient(135deg, #6366f1, #8b5cf6)" }}
+                      >
+                        {r.salesperson.name.slice(0, 1)}
+                      </div>
+                      {r.salesperson.name}
+                    </div>
+                  </td>
+                )}
+                <td style={{ textAlign: "center" }}>
+                  <span className="badge badge-purple">{r.visitCount}건</span>
+                </td>
+                <td style={{ textAlign: "center" }}>
+                  {r.commentCount > 0
+                    ? <span className="badge badge-blue">{r.commentCount}건</span>
+                    : <span style={{ color: "#cbd5e1", fontSize: "13px" }}>-</span>}
+                </td>
+                <td style={{ textAlign: "right" }}>
+                  <Link href={`/reports/${r.id}`} className="btn btn-ghost btn-sm">
+                    상세보기
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                  </Link>
                 </td>
               </tr>
             ))}
@@ -109,11 +171,16 @@ export default function ReportsPage() {
         </table>
       </div>
 
+      {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex justify-center gap-2 mt-4">
+        <div className="flex justify-center gap-2 mt-6">
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-            <button key={p} onClick={() => setPage(p)}
-              className={`px-3 py-1 rounded text-sm border ${p === page ? "bg-blue-700 text-white border-blue-700" : "bg-white hover:bg-gray-50"}`}>
+            <button
+              key={p}
+              onClick={() => setPage(p)}
+              className={`btn btn-sm ${p === page ? "btn-primary" : "btn-ghost"}`}
+              style={{ minWidth: "36px" }}
+            >
               {p}
             </button>
           ))}

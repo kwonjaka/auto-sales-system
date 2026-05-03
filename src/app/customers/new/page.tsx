@@ -27,35 +27,61 @@ export default function NewCustomerPage() {
   };
 
   const fields = [
-    { key: "companyName", label: "회사명", required: true },
-    { key: "contactName", label: "담당자명", required: true },
-    { key: "phone", label: "전화번호", required: false },
-    { key: "email", label: "이메일", required: false },
-    { key: "address", label: "주소", required: false },
-    { key: "industry", label: "업종", required: false },
+    { key: "companyName", label: "회사명", required: true, placeholder: "회사명을 입력하세요" },
+    { key: "contactName", label: "담당자명", required: true, placeholder: "담당자 이름" },
+    { key: "phone", label: "전화번호", required: false, placeholder: "010-0000-0000" },
+    { key: "email", label: "이메일", required: false, placeholder: "contact@company.com" },
+    { key: "address", label: "주소", required: false, placeholder: "주소 입력" },
+    { key: "industry", label: "업종", required: false, placeholder: "예: IT, 제조, 유통" },
   ];
 
   return (
     <AppLayout>
-      <h2 className="text-xl font-bold mb-4">고객 등록</h2>
-      <div className="bg-white rounded shadow p-6 max-w-lg">
-        <form onSubmit={submit} className="space-y-4">
-          {fields.map(({ key, label, required }) => (
-            <div key={key}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{label}{required && " *"}</label>
-              <input type="text" required={required} value={(form as Record<string, string>)[key]}
-                onChange={(e) => set(key, e.target.value)}
-                className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">고객 등록</h1>
+          <p className="page-sub">새 고객사를 등록합니다</p>
+        </div>
+      </div>
+
+      <div style={{ maxWidth: "560px" }}>
+        <div className="card">
+          <form onSubmit={submit} className="space-y-4">
+            <div className="grid gap-4" style={{ gridTemplateColumns: "1fr 1fr" }}>
+              {fields.map(({ key, label, required, placeholder }) => (
+                <div key={key} style={key === "address" ? { gridColumn: "1 / -1" } : {}}>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                    {label}{required && <span className="text-indigo-500 ml-0.5">*</span>}
+                  </label>
+                  <input
+                    type="text"
+                    required={required}
+                    value={(form as Record<string, string>)[key]}
+                    onChange={(e) => set(key, e.target.value)}
+                    placeholder={placeholder}
+                    className="form-input"
+                  />
+                </div>
+              ))}
             </div>
-          ))}
-          {errorMsg && <p className="text-red-500 text-sm">{errorMsg}</p>}
-          <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={() => router.push("/customers")} className="px-4 py-2 border rounded text-sm hover:bg-gray-50">취소</button>
-            <button type="submit" disabled={loading} className="bg-blue-700 text-white px-6 py-2 rounded text-sm hover:bg-blue-800 disabled:opacity-50">
-              {loading ? "저장 중..." : "저장"}
-            </button>
-          </div>
-        </form>
+
+            {errorMsg && (
+              <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-red-50 border border-red-100">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#e11d48" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                <p className="text-red-600 text-sm">{errorMsg}</p>
+              </div>
+            )}
+
+            <div className="flex justify-end gap-3 pt-2">
+              <button type="button" onClick={() => router.push("/customers")} className="btn btn-ghost">취소</button>
+              <button type="submit" disabled={loading} className="btn btn-primary">
+                {loading ? "저장 중..." : "저장"}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </AppLayout>
   );

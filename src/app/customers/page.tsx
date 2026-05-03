@@ -29,39 +29,99 @@ export default function CustomersPage() {
 
   return (
     <AppLayout>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold">고객 마스터</h2>
-        <Link href="/customers/new" className="bg-blue-700 text-white px-4 py-2 rounded text-sm hover:bg-blue-800">+ 고객 등록</Link>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">고객 마스터</h1>
+          <p className="page-sub">총 {total}개 고객사</p>
+        </div>
+        <Link href="/customers/new" className="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          고객 등록
+        </Link>
       </div>
 
-      <div className="bg-white rounded shadow p-4 mb-4 flex gap-2">
-        <input type="text" value={keyword} onChange={(e) => setKeyword(e.target.value)}
-          placeholder="회사명 또는 담당자명 검색"
-          className="flex-1 border rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          onKeyDown={(e) => e.key === "Enter" && (setSearch(keyword), setPage(1))} />
-        <button onClick={() => { setSearch(keyword); setPage(1); }}
-          className="bg-gray-100 px-3 py-1.5 rounded text-sm border hover:bg-gray-200">검색</button>
+      {/* Search */}
+      <div className="card mb-6">
+        <div className="flex gap-3">
+          <div className="relative flex-1">
+            <svg
+              width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2"
+              style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)" }}
+            >
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              type="text"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              placeholder="회사명 또는 담당자명 검색"
+              className="form-input"
+              style={{ paddingLeft: "40px" }}
+              onKeyDown={(e) => e.key === "Enter" && (setSearch(keyword), setPage(1))}
+            />
+          </div>
+          <button onClick={() => { setSearch(keyword); setPage(1); }} className="btn btn-ghost">
+            검색
+          </button>
+        </div>
       </div>
 
-      <div className="bg-white rounded shadow overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b">
+      {/* Table */}
+      <div className="card p-0 overflow-hidden">
+        <table className="data-table">
+          <thead>
             <tr>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">회사명</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">담당자명</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">전화번호</th>
-              <th className="px-4 py-3" />
+              <th>회사명</th>
+              <th>담당자명</th>
+              <th>전화번호</th>
+              <th />
             </tr>
           </thead>
-          <tbody className="divide-y">
-            {customers.length === 0 && <tr><td colSpan={4} className="text-center py-8 text-gray-400">고객이 없습니다.</td></tr>}
+          <tbody>
+            {customers.length === 0 && (
+              <tr>
+                <td colSpan={4} style={{ textAlign: "center", padding: "48px", color: "#94a3b8" }}>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="1.5">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                      <circle cx="9" cy="7" r="4" />
+                    </svg>
+                    <p>등록된 고객이 없습니다.</p>
+                  </div>
+                </td>
+              </tr>
+            )}
             {customers.map((c) => (
-              <tr key={c.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3">{c.companyName}</td>
-                <td className="px-4 py-3">{c.contactName}</td>
-                <td className="px-4 py-3 text-gray-500">{c.phone ?? "-"}</td>
-                <td className="px-4 py-3 text-right">
-                  <Link href={`/customers/${c.id}/edit`} className="text-blue-600 hover:underline text-xs">수정</Link>
+              <tr key={c.id}>
+                <td>
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+                      style={{ background: "linear-gradient(135deg, #06b6d4, #3b82f6)" }}
+                    >
+                      {c.companyName.slice(0, 1)}
+                    </div>
+                    <span className="font-semibold text-slate-700">{c.companyName}</span>
+                  </div>
+                </td>
+                <td className="text-slate-600">{c.contactName}</td>
+                <td>
+                  {c.phone
+                    ? <span className="badge badge-blue">{c.phone}</span>
+                    : <span style={{ color: "#cbd5e1" }}>-</span>}
+                </td>
+                <td style={{ textAlign: "right" }}>
+                  <Link href={`/customers/${c.id}/edit`} className="btn btn-ghost btn-sm">
+                    수정
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                    </svg>
+                  </Link>
                 </td>
               </tr>
             ))}
@@ -70,10 +130,11 @@ export default function CustomersPage() {
       </div>
 
       {totalPages > 1 && (
-        <div className="flex justify-center gap-2 mt-4">
+        <div className="flex justify-center gap-2 mt-6">
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-            <button key={p} onClick={() => setPage(p)}
-              className={`px-3 py-1 rounded text-sm border ${p === page ? "bg-blue-700 text-white" : "bg-white hover:bg-gray-50"}`}>{p}</button>
+            <button key={p} onClick={() => setPage(p)} className={`btn btn-sm ${p === page ? "btn-primary" : "btn-ghost"}`} style={{ minWidth: "36px" }}>
+              {p}
+            </button>
           ))}
         </div>
       )}
